@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = MyStocksActivity.class.getSimpleName();
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -48,13 +50,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
      */
     private CharSequence mTitle;
     private Intent mServiceIntent;
-    private ItemTouchHelper mItemTouchHelper;
     private static final int CURSOR_LOADER_ID = 0;
     private QuoteCursorAdapter mCursorAdapter;
     private Context mContext;
     private Cursor mCursor;
-    TextView emptyStock;
-    public Snackbar snackbar;
+    private TextView emptyStock;
+    private Snackbar snackbar;
+    private boolean changeUnitsMoney = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +73,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         mServiceIntent = new Intent(this, StockIntentService.class);
         if (savedInstanceState == null) {
             // Run the initialize task service so that some stocks appear upon an empty database
-            mServiceIntent.putExtra("tag", "init");
+            mServiceIntent.putExtra(getString(R.string.string_tag), (getString(R.string.string_init)));
             if (Utils.isNetworkAvailable(this)) {
                 startService(mServiceIntent);
             } else {
@@ -120,13 +122,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                                                         Toast.LENGTH_LONG);
                                         toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                                         toast.show();
-                                        return;
                                     } else {
                                         // Add the stock to DB
-                                        mServiceIntent.putExtra("tag", "add");
-                                        mServiceIntent.putExtra("symbol", input.toString().toUpperCase());
+                                        mServiceIntent.putExtra(getString(R.string.string_tag), getString(R.string.string_add));
+                                        mServiceIntent.putExtra(getString(R.string.string_symbol), input.toString().toUpperCase());
                                         startService(mServiceIntent);
                                     }
+                                    c.close();
                                 }
                             })
                             .show();
@@ -141,14 +143,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         emptyStock = (TextView) findViewById(R.id.noStock);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
 
         mTitle = getTitle();
         if (Utils.isNetworkAvailable(this)) {
             long period = 3600L;
             long flex = 10L;
-            String periodicTag = "periodic";
 
             // create a periodic task to pull stocks once every hour after the app has been opened. This
             // is so Widget data stays up to date.
@@ -156,7 +157,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                     .setService(StockTaskService.class)
                     .setPeriod(period)
                     .setFlex(flex)
-                    .setTag(periodicTag)
+                    .setTag(getString(R.string.string_periodic))
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                     .setRequiresCharging(false)
                     .build();
@@ -167,8 +168,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     }
 
 
-    public void onRefresh() {
-        mServiceIntent.putExtra("tag", "periodic");
+    private void onRefresh() {
+        mServiceIntent.putExtra(getString(R.string.string_tag), getString(R.string.string_periodic));
         if (Utils.isNetworkAvailable(this)) {
             startService(mServiceIntent);
         } else {
@@ -183,20 +184,15 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
     }
 
-    public void networkToast() {
+    private void networkToast() {
         //Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
         snackbar = Snackbar
                 .make(findViewById(android.R.id.content), getString(R.string.network_toast), Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        try {
-                            if (!Utils.isNetworkAvailable(mContext)) {
-                                networkToast();
-                            }
-
-                        } catch (Exception e) {
-
+                        if (!Utils.isNetworkAvailable(mContext)) {
+                            networkToast();
                         }
                     }
                 });
@@ -204,16 +200,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void snackbarDismiss() {
-        if(snackbar != null) {
+        if (snackbar != null) {
             View snackbarView = snackbar.getView();
             Button snackbarActionButton = (Button) snackbarView.findViewById(android.support.design.R.id.snackbar_action);
             snackbarActionButton.performClick();
         }
     }
 
-    public void restoreActionBar() {
+    private void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
@@ -221,8 +217,41 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_stocks, menu);
+
         restoreActionBar();
         return true;
+    }
+
+    /**
+     * Prepare the Screen's standard options menu to be displayed.  This is
+     * called right before the menu is shown, every time it is shown.  You can
+     * use this method to efficiently enable/disable items or otherwise
+     * dynamically modify the contents.
+     * <p/>
+     * <p>The default implementation updates the system menu items based on the
+     * activity's state.  Deriving classes should always call through to the
+     * base class implementation.
+     *
+     * @param menu The options menu as last shown or first initialized by
+     *             onCreateOptionsMenu().
+     * @return You must return true for the menu to be displayed;
+     * if you return false it will not be shown.
+     * @see #onCreateOptionsMenu
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem moneyMenu = menu.findItem(R.id.action_change_units_money);
+        MenuItem percentMenu = menu.findItem(R.id.action_change_units_percent);
+        Log.d(TAG, "onPrepareOptionsMenu: " + changeUnitsMoney);
+        if (!changeUnitsMoney) {
+            moneyMenu.setVisible(false);
+            percentMenu.setVisible(true);
+        } else {
+            moneyMenu.setVisible(true);
+            percentMenu.setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -242,9 +271,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
             return true;
         }
-
-
-        if (id == R.id.action_change_units) {
+        changeUnitsMoney = true;
+        if (id == R.id.action_change_units_money || id == R.id.action_change_units_percent) {
+            if (id == R.id.action_change_units_money) {
+                changeUnitsMoney = false;
+            }
+            invalidateOptionsMenu();
             // this is for changing stock changes from percent value to dollar value
             Utils.showPercent = !Utils.showPercent;
             this.getContentResolver().notifyChange(QuoteProvider.Quotes.CONTENT_URI, null);

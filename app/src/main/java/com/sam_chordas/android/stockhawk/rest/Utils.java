@@ -42,9 +42,7 @@ public class Utils {
                 if (count == 1) {
                     jsonObject = jsonObject.getJSONObject("results")
                             .getJSONObject("quote");
-                    Log.d(LOG_TAG, "quoteJsonToContentVals: " + jsonObject);
                     String bidPrice = jsonObject.getString("Bid");
-                    Log.d(LOG_TAG, "quoteJsonToContentVals:bidPrice asdasd:  " + bidPrice);
                     if (!bidPrice.equalsIgnoreCase("null")) {// && bidPrice != null && !bidPrice.isEmpty()) {
                         batchOperations.add(buildBatchOperation(jsonObject));
                     } else {
@@ -74,19 +72,16 @@ public class Utils {
         return batchOperations;
     }
 
-    public static String truncateBidPrice(String bidPrice) {
-        Log.d("Utils", "truncateBidPrice: "+bidPrice);
-        //TODO - remove this if else before release
-        if(!bidPrice.equals(null)) {
+    private static String truncateBidPrice(String bidPrice) {
+        if (!bidPrice.equals(null)) {
             bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
         } else {
             bidPrice = "0.00";
         }
-        Log.d("Utils", "truncateBidPrice: "+bidPrice);
         return bidPrice;
     }
 
-    public static String truncateChange(String change, boolean isPercentChange) {
+    private static String truncateChange(String change, boolean isPercentChange) {
         String weight = change.substring(0, 1);
         String ampersand = "";
         if (isPercentChange) {
@@ -103,14 +98,13 @@ public class Utils {
         return change;
     }
 
-    public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject) {
+    private static ContentProviderOperation buildBatchOperation(JSONObject jsonObject) {
         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                 QuoteProvider.Quotes.CONTENT_URI);
         try {
             String change = jsonObject.getString("Change");
             builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
             builder.withValue(QuoteColumns.NAME, jsonObject.getString("Name"));
-            Log.d(LOG_TAG, "buildBatchOperation: jsonObject.getString(\"Bid\"): " + jsonObject.getString("Bid"));
             builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
             builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
                     jsonObject.getString("ChangeinPercent"), true));

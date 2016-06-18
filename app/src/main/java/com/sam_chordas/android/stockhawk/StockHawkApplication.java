@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.facebook.stetho.Stetho;
+import com.sam_chordas.android.stockhawk.network.VolleyManager;
 
 /**
  * Created by Senthil on 25/03/16.
@@ -27,7 +28,9 @@ public class StockHawkApplication extends Application {
         super.onCreate();
         Log.d("Application", "onCreate: ");
         applicationContext = getApplicationContext();
+        //Initializing VolleyManager
+        VolleyManager.init(getApplicationContext());
         Stetho.initializeWithDefaults(this);
-        Log.d("StockHawkApplication", "StockHawkApplication: oncreate: "+applicationContext);
+        Log.d("StockHawkApplication", "StockHawkApplication: oncreate: " + applicationContext);
     }
 }
