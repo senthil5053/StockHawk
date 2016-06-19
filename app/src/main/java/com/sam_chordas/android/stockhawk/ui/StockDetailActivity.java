@@ -49,12 +49,9 @@ public class StockDetailActivity extends AppCompatActivity {
     private String pastDate;
     private LineChart chart;
     private int lastId;
-    private RealmLineData realmLineData;
     private Realm realm;
     private String symbol;
     private RealmChangeListener realmChangeListener;
-    private RealmResults<HistoricalData> results;
-    private RealmLineDataSet<HistoricalData> historicalDataRealmLineDataSet;
     private ProgressBar progressBar;
     Toast mToast;
 
@@ -182,10 +179,10 @@ public class StockDetailActivity extends AppCompatActivity {
         //realm.beginTransaction();
 
 
-        results = realm.where(HistoricalData.class).equalTo("stock", symbol).findAll();
+        RealmResults<HistoricalData> results = realm.where(HistoricalData.class).equalTo("stock", symbol).findAll();
         results.addChangeListener(realmChangeListener);
 
-        historicalDataRealmLineDataSet = new RealmLineDataSet(results, "value", "id");
+        RealmLineDataSet<HistoricalData> historicalDataRealmLineDataSet = new RealmLineDataSet(results, "value", "id");
         // create a dataset and give it a type
 
         historicalDataRealmLineDataSet.setDrawFilled(true);
@@ -199,7 +196,7 @@ public class StockDetailActivity extends AppCompatActivity {
         ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
         dataSets.add(historicalDataRealmLineDataSet); // add the datasets
 
-        realmLineData = new RealmLineData(results, "date", dataSets);
+        RealmLineData realmLineData = new RealmLineData(results, "date", dataSets);
 
 
         chart.setDrawGridBackground(false);

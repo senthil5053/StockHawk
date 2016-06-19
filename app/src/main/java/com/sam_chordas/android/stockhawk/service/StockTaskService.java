@@ -118,9 +118,6 @@ public class StockTaskService extends GcmTaskService {
             initQueryCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
                     new String[]{"Distinct " + QuoteColumns.SYMBOL}, null,
                     null, null);
-            if (initQueryCursor != null) {
-                Log.d("TEST", "onRunTask: get count: " + initQueryCursor.getCount());
-            }
             if (initQueryCursor.getCount() == 0 || initQueryCursor == null) {
                 // Init task. Populates DB with quotes for the symbols seen below
                 try {
@@ -133,8 +130,7 @@ public class StockTaskService extends GcmTaskService {
                 DatabaseUtils.dumpCursor(initQueryCursor);
                 initQueryCursor.moveToFirst();
                 for (int i = 0; i < initQueryCursor.getCount(); i++) {
-                    mStoredSymbols.append("\"" +
-                            initQueryCursor.getString(initQueryCursor.getColumnIndex(mContext.getString(R.string.string_symbol))) + "\",");
+                    mStoredSymbols.append("\"").append(initQueryCursor.getString(initQueryCursor.getColumnIndex(mContext.getString(R.string.string_symbol)))).append("\",");
                     initQueryCursor.moveToNext();
                 }
                 mStoredSymbols.replace(mStoredSymbols.length() - 1, mStoredSymbols.length(), ")");

@@ -2,24 +2,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MyStocksActivity">
-  <item android:id="@+id/action_change_units_money"
-      android:title="@string/action_change_units"
-      android:icon="@drawable/ic_attach_money_white_24dp"
-      android:orderInCategory="99"
-      app:showAsAction="always"/>
-  <item android:id="@+id/action_change_units_percent"
-      android:title="@string/action_change_units"
-      android:icon="@drawable/ic_percentage_white"
-      android:orderInCategory="99"
-      app:showAsAction="always"
-      android:visible="false"/>
- <!-- <item android:id="@+id/action_settings"
-      android:title="@string/action_settings"
-      android:orderInCategory="100"
-      app:showAsAction="never" />-->
-  <item
-      android:id="@+id/action_refresh"
-      android:icon="@drawable/refresh"
-      android:title="@string/refresh_btn"
-      app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_change_units_money"
+        android:icon="@drawable/ic_attach_money_white_24dp"
+        android:orderInCategory="99"
+        android:title="@string/action_change_units"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_change_units_percent"
+        android:icon="@drawable/ic_percentage_white"
+        android:orderInCategory="99"
+        android:title="@string/action_change_units"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/refresh"
+        android:title="@string/refresh_btn"
+        app:showAsAction="ifRoom" />
 </menu>

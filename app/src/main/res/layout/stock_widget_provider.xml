@@ -34,7 +34,6 @@
             android:layout_gravity="end"
             android:background="@color/material_blue_500"
             android:contentDescription="@string/refreshbtn"
-
             android:drawableTop="@drawable/refresh"
             android:padding="10dp" />
     </FrameLayout>

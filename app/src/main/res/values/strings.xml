@@ -25,4 +25,5 @@
     <string name="refresh_btn">Refresh</string>
     <string name="stock_chart">Stock Chart</string>
     <string name="refreshbtn">Refresh Button</string>
+    <string name="add_stock_button">Add Stock Button</string>
 </resources>

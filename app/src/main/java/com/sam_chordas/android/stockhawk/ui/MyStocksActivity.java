@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -243,7 +242,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
         MenuItem moneyMenu = menu.findItem(R.id.action_change_units_money);
         MenuItem percentMenu = menu.findItem(R.id.action_change_units_percent);
-        Log.d(TAG, "onPrepareOptionsMenu: " + changeUnitsMoney);
         if (!changeUnitsMoney) {
             moneyMenu.setVisible(false);
             percentMenu.setVisible(true);

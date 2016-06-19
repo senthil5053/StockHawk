@@ -26,7 +26,6 @@ public class StockIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Context mContext = StockHawkApplication.applicationContext;
-        Log.d(StockIntentService.class.getSimpleName(), "Stock Intent Service");
         StockTaskService stockTaskService = new StockTaskService(this);
         Bundle args = new Bundle();
         if (intent.getStringExtra(mContext.getString(R.string.string_tag)).equals(mContext.getString(R.string.string_add))) {
